@@ -1,15 +1,16 @@
 from django.contrib.auth.models import User, Group
 from django.http import Http404
+from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.views import APIView
-from myApi.serializers import UserSerializer,GroupSerializer
+from myApi.serializers import UserSerializer, GroupSerializer, SnippetSerializer
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from myApi.models import Snippet
-from myApi.serializers import SnippetSerializer
 from rest_framework import mixins
 from rest_framework import generics
+from rest_framework import permissions
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -190,10 +191,25 @@ class SnippetDetail(mixins.RetrieveModelMixin,
 """
 
 class SnippetList(generics.ListCreateAPIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
