@@ -11,6 +11,7 @@ from myApi.models import Snippet
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import permissions
+from myApi.permissions import IsOwnerOrReadOnly
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -190,17 +191,31 @@ class SnippetDetail(mixins.RetrieveModelMixin,
 
 """
 
+
 class SnippetList(generics.ListCreateAPIView):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    """
+    REST framework includes a number of permission classes that we can use to restrict who can access a given view.
+    In this case the one we're looking for is IsAuthenticatedOrReadOnly,
+    which will ensure that authenticated requests get read-write access,
+    and unauthenticated requests get read-only access.
+    """
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
-
+    """
+    The way we deal with that is by overriding a .perform_create() method on our snippet views,
+    that allows us to modify how the instance save is managed,
+    and handle any information that is implicit in the incoming request or requested URL.
+    The way we deal with that is by overriding a .perform_create() method on our snippet views
+    that allows us to modify how the instance save is managed, and handle any information that
+    is implicit in the incoming request or requested URL.
+    """
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
 
