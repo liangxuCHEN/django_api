@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User, Group
 from django.http import Http404
+from django.shortcuts import render, redirect,render_to_response
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -12,7 +14,9 @@ from rest_framework import mixins
 from rest_framework import generics
 from rest_framework import permissions
 from myApi.permissions import IsOwnerOrReadOnly
-
+from myApi.tools import merge_file
+import os
+from django.http import StreamingHttpResponse
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -228,3 +232,47 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+def home_page(request):
+    return render(request, 'index.html')
+
+
+def func_download(request):
+    if request.method == 'POST':
+        data = request.POST
+        print(data)
+        print(data['output_file_name'])
+        merge_file(data)
+        file_name = '%s\%s.xls' % (data['dir_name'], data['output_file_name'])
+        """
+        if res:
+
+            return HttpResponse("<p>%s</p>" % file_name)
+        else:
+            return HttpResponse("<p>Error</p>")
+        """
+        print(file_name)
+
+        def file_iterator(name, chunk_size=512):
+            with open(name, 'rb') as f:
+                while True:
+                    c = f.read(chunk_size)
+                    if c:
+                        yield c
+                    else:
+                        print('Break')
+                        break
+
+        response = StreamingHttpResponse(file_iterator(file_name))
+        response['Content-Type'] = 'application/-excel'
+        response['Content-Encoding'] = 'utf-8'
+        response['Content-Disposition'] = 'attachment;filename="{0}.xls"'.format(data['output_file_name'])
+        return response
+    else:
+        return redirect('/')
+
+
+
+
+

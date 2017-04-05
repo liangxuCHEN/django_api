@@ -12,7 +12,9 @@ The r'^api-auth/' part of pattern can actually be whatever URL you want to use.
 The only restriction is that the included urls must use the 'rest_framework' namespace.
 """
 urlpatterns = [
-    url(r'^', include('myApi.urls')),
+    url(r'^func_download$', views.func_download, name='func_download'),
+    url(r'^$', views.home_page, name='home_page'),
+    url(r'^api', include('myApi.urls')),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
