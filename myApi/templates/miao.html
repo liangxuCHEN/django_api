@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}管理系统{% endblock %}
+{% block content %}
+<div class="jumbotron">
+    <p>天猫喵师傅核心信息批量下载，并且合并成一个excel下载到本地</p>
+</div>
+<form action="{% url 'func_download' %}" method="post" class="form">
+    {% csrf_token %}
+    <label>开始时间 (ex:2017-04-01): <input type="text" name="ship_time_from" /></label></br>
+    <label>结束时间 (ex:2017-04-01):<input type="text" name="ship_time_end" /></label></br>
+    <label>总页数:<input type="number"  name="page_num" /></label></br>
+    <label>输出文档名字:<input type="text" name="output_file_name" /></label></br>
+    <input type="hidden" name="dir_name" value="C:\Users\Administrator\Downloads\Tian_download">
+    <button type="submit">提交</button>
+</form>
+{% endblock %}

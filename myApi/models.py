@@ -36,3 +36,9 @@ class Snippet(models.Model):
                                   full=True, **options)
         self.highlighted = highlight(self.code, lexer, formatter)
         super(Snippet, self).save(*args, **kwargs)
+
+
+class Solution(models.Model):
+    solution_id = models.CharField(max_length=12)
+    created_at = models.DateTimeField()
+    delivery_date = models.DateField()

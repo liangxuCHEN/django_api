@@ -238,6 +238,14 @@ def home_page(request):
     return render(request, 'index.html')
 
 
+def miao_page(request):
+    return render(request, 'miao.html')
+
+
+def logistics_page(request):
+    return render(request, 'miao.html')
+
+
 def func_download(request):
     if request.method == 'POST':
         data = request.POST
